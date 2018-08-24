@@ -155,8 +155,8 @@ profile_t * generate_profile(const char *profile_name, const char *username, con
 
     sodium_memzero(profile, sizeof(profile_t));
 
-    strncpy((char *) profile->username, username, sizeof(profile->username));
-    strncpy((char *) profile->passphrase, passphrase, sizeof(profile->passphrase));
+    strncpy((char *) profile->username, username, sizeof(profile->username)-1);
+    strncpy((char *) profile->passphrase, passphrase, sizeof(profile->passphrase)-1);
 
     if (0 == strcmp(profile_name, PROFILE_2015_NAME))
     {

@@ -22,7 +22,7 @@ GLIB_TESTS
 
 PASSPHRASE_IDENTITY_CFLAGS=
 
-PREFERRED_CFLAGS="-pedantic -Werror -Wall -Wextra -Wbad-function-cast -Wcast-align -Wcast-qual -Wfloat-equal -Wformat=2 -Wformat-security -Wformat-nonliteral -Winit-self -Winline -Wmissing-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wmissing-noreturn -Wpointer-arith -Wredundant-decls -Wshadow -Wswitch-default -Wunused -Wunused-result -fPIE"
+PREFERRED_CFLAGS="-pedantic -Wall -Wextra -Wbad-function-cast -Wcast-align -Wcast-qual -Wfloat-equal -Wformat=2 -Wformat-security -Wformat-nonliteral -Winit-self -Winline -Wmissing-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wmissing-noreturn -Wpointer-arith -Wredundant-decls -Wshadow -Wswitch-default -Wunused -Wunused-result -fPIE"
 LDFLAGS="$LDFLAGS -pie -z relro -z now"
 
 for flag in $PREFERRED_CFLAGS; do
@@ -30,6 +30,17 @@ for flag in $PREFERRED_CFLAGS; do
 done
 
 AC_SUBST([PASSPHRASE_IDENTITY_CFLAGS])
+
+AC_ARG_ENABLE([gui],
+	AS_HELP_STRING([--disable-gui], [Disable compilation of GTK gui]))
+
+AS_IF([test "x$enable_gui" != "xno"], [
+	    PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+	    AC_CONFIG_FILES([
+		gui/Makefile
+	    ])
+	    AC_CONFIG_SRCDIR([gui/main.c])
+])
 
 AC_CONFIG_FILES([
     Makefile
