@@ -23,7 +23,7 @@ GLIB_TESTS
 PASSPHRASE_IDENTITY_CFLAGS=
 
 PREFERRED_CFLAGS="-pedantic -Wall -Wextra -Wbad-function-cast -Wcast-align -Wcast-qual -Wfloat-equal -Wformat=2 -Wformat-security -Wformat-nonliteral -Winit-self -Winline -Wmissing-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wmissing-noreturn -Wpointer-arith -Wredundant-decls -Wshadow -Wswitch-default -Wunused -Wunused-result -fPIE"
-LDFLAGS="$LDFLAGS -pie -z relro -z now"
+LDFLAGS="$LDFLAGS -pie -z relro -z now -z noexecstack"
 
 for flag in $PREFERRED_CFLAGS; do
     AX_CHECK_COMPILER_FLAGS([$flag], [PASSPHRASE_IDENTITY_CFLAGS="$PASSPHRASE_IDENTITY_CFLAGS $flag"],)
@@ -37,6 +37,13 @@ AM_CONDITIONAL([ENABLE_GUI], [test "x$enable_gui" != "xno"])
 
 AS_IF([test "x$enable_gui" != "xno"], [
 	    PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+
+	    # Embed src/gui.glade in the binary to avoid having to load
+	    # an external XML file. It is embedded between the symbols
+	    # "_binary_gui_glade_start" and "_binary_gui_glade_end"
+	    # See main-gui.c for more info:
+	    LDFLAGS="$LDFLAGS -Wl,--format=binary gui.glade"
+	    LDFLAGS="$LDFLAGS -Wl,--format=default"
 ])
 
 AC_CONFIG_FILES([

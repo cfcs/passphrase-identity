@@ -51,5 +51,6 @@ missing
 src/config.h
 stamp-h1
 passphrase-identity
+passphrase-identity-gui
 test-driver
 tests/*.tmp.buffer

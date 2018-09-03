@@ -11,7 +11,13 @@ You must be able to remember three things to (re)generate your key pair;
 2. A Passphrase-identity defined "profile" name. There's currently only two profiles available: `2015v1`, and `2017`, both of which use `scrypt()` + `salsa20/8` + `sha256` as KDF.
 3. Your personally selected passphrase.
 
-## Usage
+## Usage (GTK interface)
+
+**TODO insert screenshot?**
+
+The graphical tool `passphrase-identity-gui` can be used instead of the commandline utility. It exposes the exact same options as the cli tool detailed below.
+
+## Usage (cmdline)
 
     Usage: ./passphrase-identity [ options ] [ output directory ]
 
@@ -86,26 +92,34 @@ You must be able to remember three things to (re)generate your key pair;
 # if you want to use a proxy for git via https:
 # git config --global http.proxy 'socks5://127.0.0.1:9150'
 
+# To build the GTK interface,
+apt install --no-install-recommends libgtk-3-dev
+
 git clone https://github.com/ahf/passphrase-identity
 apt-get install autoconf libtool pkg-config libsodium-dev -y
 cd passphrase-identity/
-./autogen.sh
-./configure
-make
+autoconf && automake && make
 # Binary will be named ./src/passphrase-identity
+```
+
+For development:
+```bash
+# To edit the gui.glade file with `glade`:
+apt install --no-install-recommends glade
 ```
 
 ## Authors
 
 - [Alexander Færøy](https://twitter.com/ahfaeroey) ([ahf@0x90.dk](mailto:ahf@0x90.dk)).
+- [cfcs](https://github.com/cfcs/)
 
-## Todo
+## TODO
 
 1. Code clean-up. This is a prototype written during two evenings of a weekend.
 2. Consider the new Tor ed25519 ID keys?
 3. Add proper tests. Use Travis CI to build on both OS X and Linux.
 4. Add fancy graphics after key generation, like the OpenSSH client, such that
-   the user can quickly identify if something is wrong. 
+   the user can quickly identify if something is wrong.
 5. Add cracklib support and remember to make it possible to disable it as well.
 
 ## License

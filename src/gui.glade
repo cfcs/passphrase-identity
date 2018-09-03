@@ -40,15 +40,19 @@
   </object>
   <object class="GtkListStore" id="profiles">
     <columns>
-      <!-- column-name Profiles -->
+      <!-- column-name Displayed -->
+      <column type="gchararray"/>
+      <!-- column-name id -->
       <column type="gchararray"/>
     </columns>
     <data>
       <row>
         <col id="0">2017</col>
+        <col id="1" translatable="yes">2017</col>
       </row>
       <row>
         <col id="0">2015v1</col>
+        <col id="1" translatable="yes">2015v1</col>
       </row>
     </data>
   </object>
@@ -124,12 +128,14 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkCheckButton">
-                            <property name="label" translatable="yes">OpenPGP</property>
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
-                            <property name="draw_indicator">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="margin_left">12</property>
+                            <property name="margin_right">10</property>
+                            <property name="label" translatable="yes">id_ed25519
+id_ed25519.pub</property>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -137,12 +143,14 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkCheckButton">
-                            <property name="label" translatable="yes">SSH</property>
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
-                            <property name="draw_indicator">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="margin_left">12</property>
+                            <property name="margin_right">10</property>
+                            <property name="label" translatable="yes">public.asc
+secret.asc</property>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -150,10 +158,30 @@
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkCheckButton" id="pgp_toggle">
+                            <property name="label" translatable="yes">OpenPGP</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">1</property>
+                          </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkCheckButton" id="ssh_toggle">
+                            <property name="label" translatable="yes">SSH</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -201,7 +229,8 @@
                     <property name="active">1</property>
                     <property name="has_entry">True</property>
                     <property name="entry_text_column">0</property>
-                    <property name="id_column">0</property>
+                    <property name="id_column">1</property>
+                    <property name="active_id">2017</property>
                     <child internal-child="entry">
                       <object class="GtkEntry">
                         <property name="can_focus">False</property>
@@ -232,30 +261,6 @@
                 <property name="can_focus">False</property>
                 <property name="row_spacing">20</property>
                 <property name="column_spacing">50</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Choose output directory</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton">
-                    <property name="label" translatable="yes">Generate!</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="on_generate_clicked" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">4</property>
-                  </packing>
-                </child>
                 <child>
                   <object class="GtkAlignment">
                     <property name="visible">True</property>
@@ -289,7 +294,44 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton" id="output_button">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Verify passphrase:</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="passphrase_repeated">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="max_length">64</property>
+                    <property name="visibility">False</property>
+                    <property name="max_width_chars">32</property>
+                    <property name="placeholder_text" translatable="yes">Passphrase again ...</property>
+                    <property name="input_purpose">password</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Choose output directory</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="output_directory">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="action">select-folder</property>
@@ -298,14 +340,26 @@
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">1</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Note that the passphrase MUST
+BE at least 12 characters:</property>
+                    <property name="wrap">True</property>
+                    <property name="ellipsize">start</property>
+                    <property name="width_chars">16</property>
+                    <attributes>
+                      <attribute name="style" value="italic"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>
@@ -324,7 +378,18 @@
               </packing>
             </child>
             <child type="center">
-              <placeholder/>
+              <object class="GtkButton">
+                <property name="label" translatable="yes">Generate!</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_generate_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
             </child>
           </object>
           <packing>
