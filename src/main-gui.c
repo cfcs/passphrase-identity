@@ -1,18 +1,35 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 
+#include "core.h"
+
 static void on_destroy(GtkWidget *_widget, gpointer _data);
 static void
-on_destroy(GtkWidget *widget, gpointer data)
+on_destroy(GtkWidget *widget __attribute__((__unused__)),
+    gpointer data __attribute__((__unused__)) )
 {
 	gtk_main_quit();
 }
 
 void on_generate_clicked(void *_widget, gpointer _data);
 void
-on_generate_clicked(void *widget, gpointer data)
+on_generate_clicked(void *widget __attribute__((__unused__)),
+    gpointer data __attribute__((__unused__)))
 {
 	printf("Generate! clicked\n");
+	const char *err_msg = passphrase_is_invalid("p1", "p2");
+	if (err_msg) {
+		return;
+	}
+/*
+	struct profile_t *profile =
+	    generate_profile(profile_name, username, passphrase);
+
+	bool success =
+	    output_profiles(profile, output_directory, ssh_output, gpg_output);
+
+	free_profile_t(profile);
+*/
 }
 
 int
@@ -32,6 +49,8 @@ main(int argc, char *argv[])
 	/* Quitting main window kills us: */
 	g_signal_connect(G_OBJECT(window), "destroy",
 	    G_CALLBACK(on_destroy), NULL);
+
+	pi_init();
 
 	/* Show main window and enter event loop: */
 	gtk_widget_show(window);

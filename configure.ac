@@ -33,13 +33,10 @@ AC_SUBST([PASSPHRASE_IDENTITY_CFLAGS])
 
 AC_ARG_ENABLE([gui],
 	AS_HELP_STRING([--disable-gui], [Disable compilation of GTK gui]))
+AM_CONDITIONAL([ENABLE_GUI], [test "x$enable_gui" != "xno"])
 
 AS_IF([test "x$enable_gui" != "xno"], [
 	    PKG_CHECK_MODULES([GTK], [gtk+-3.0])
-	    AC_CONFIG_FILES([
-		gui/Makefile
-	    ])
-	    AC_CONFIG_SRCDIR([gui/main.c])
 ])
 
 AC_CONFIG_FILES([

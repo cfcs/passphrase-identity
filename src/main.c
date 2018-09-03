@@ -16,6 +16,7 @@
 #include "profile.h"
 #include "readpassphrase.h"
 #include "memory.h"
+#include "core.h"
 
 static void usage(const char *program)
 {
@@ -84,8 +85,7 @@ int main(int argc, char *argv[])
     char passphrase[1024];
     char passphrase_verify[sizeof passphrase];
 
-    // Initialize base64 encoder and decoder.
-    buffer_init();
+    pi_init();
 
     while ((option = getopt_long(argc, argv, "gshu:p:", options, NULL)) != -1)
     {
@@ -140,12 +140,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (sodium_init() == -1)
-    {
-        fprintf(stderr, "Error: Unable to initialize libsodium ...\n");
-        return EXIT_FAILURE;
-    }
-
     sodium_mlock(passphrase, sizeof(passphrase));
     sodium_mlock(passphrase_verify, sizeof(passphrase_verify));
     memory_zero(passphrase, sizeof passphrase);
@@ -159,61 +153,23 @@ int main(int argc, char *argv[])
         goto cleanup_passphrase_and_exit;
     }
 
-    if(0 != strncmp(passphrase, passphrase_verify, sizeof(passphrase_verify)))
-    {
-        fprintf(stderr, "Error: Passphrases do not match.\n");
-        success = false;
-        goto cleanup_passphrase_and_exit;
-    }
-
-    if(strlen(passphrase) < 12)
-    {
-        fprintf(stderr, "Error: Provided passphrase is shorter than 12 characters.\n");
-        success = false;
-        goto cleanup_passphrase_and_exit;
-    }
+    do {
+	    const char *err_msg = passphrase_is_invalid(passphrase,
+		passphrase_verify);
+	    if (err_msg) {
+		    fprintf(stderr, "%s", err_msg);
+		    success = false;
+		    goto cleanup_passphrase_and_exit;
+	    }
+    } while(0);
 
     printf("Generating key material using the '%s' profile ...\n", profile_name);
     printf("This may take a little while ...\n");
 
-    struct profile_t * profile = generate_profile(profile_name, username, passphrase);
+    struct profile_t * profile =
+	generate_profile(profile_name, username, passphrase);
 
-    if (ssh_output)
-    {
-        if (generate_openssh_keypair(profile))
-        {
-            printf("Successfully generated SSH key pair ...\n");
-            // TODO check return val of this or make it a void(*)(..)
-            openssh_write(output_directory, profile->username, strlen(profile->username), (unsigned char *) &(profile->openssh_secret), (unsigned char *) &(profile->openssh_public));
-        }
-        else
-        {
-            fprintf(stderr, "Error: Unable to generate SSH key pair ...\n");
-            success = false;
-        }
-    }
-
-    if (gpg_output)
-    {
-        if (generate_openpgp_keypair(profile))
-        {
-            printf("Successfully generated OpenPGP key pair ...\n");
-            if (openpgp_write(output_directory, profile))
-            {
-                printf("Successfully wrote OpenPGP key pair to disk.\n");
-            }
-            else
-            {
-                fprintf(stderr, "Failed to write OpenPGP key pair to disk...\n");
-                success = false;
-            }
-        }
-        else
-        {
-            fprintf(stderr, "Error: Unable to generate GPG key pair ...\n");
-            success = false;
-        }
-    }
+    success &= output_profiles(profile, output_directory, ssh_output, gpg_output);
 
     free_profile_t(profile);
     sodium_munlock(username, username_length);
